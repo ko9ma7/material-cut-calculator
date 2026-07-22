@@ -27,7 +27,6 @@ js/calculator.js             검증과 절단 배치 계산 엔진
 js/storage.js                자동 저장, JSON 호환·백업
 js/materials/                자재 모양별 규격 데이터
 tests/                       계산 경계와 정적 구조 검사
-.github/workflows/           GitHub Pages 자동 배포
 ```
 
 ## 자재 규격 수정
@@ -53,6 +52,8 @@ npm run serve
 ```
 
 그다음 `http://localhost:4173`을 엽니다. 외부 패키지 설치는 필요 없습니다.
+
+공개 사이트는 GitHub Pages가 `main` 브랜치 루트를 직접 배포합니다. `main`에 새 커밋을 푸시하면 페이지가 자동 갱신됩니다.
 
 ## 데이터와 개인정보
 
