@@ -50,6 +50,7 @@ const server = http.createServer((request, response) => {
   assert.match(await page.locator("#bomContainer").textContent(), /양끝 50mm/);
   assert.match(await page.locator("#summaryContainer").textContent(), /1본/);
   await page.screenshot({ path: path.join(shotDir, "01-cutflow-overview.png"), fullPage: true });
+  await page.locator(".input-panel").screenshot({ path: path.join(shotDir, "02-material-input.png") });
   await page.locator("#results").screenshot({ path: path.join(shotDir, "03-cutting-result.png") });
 
   await page.reload({ waitUntil: "networkidle" });
