@@ -1,0 +1,22 @@
+@page { size: A4 landscape; margin: 12mm; }
+:root, [data-theme="dark"] { color-scheme: light; --surface: #fff; --surface-soft: #f4f5f7; --text: #111827; --muted: #4b5563; --line: #cbd5e1; --primary: #c2410c; }
+body { background: #fff !important; color: #111827 !important; padding: 0 !important; font-size: 9pt; }
+.app-header, .hero, .setup-panel, .input-panel, .utility-bar, dialog, .toast, .results-head .button, .calculation-note { display: none !important; }
+.shell { width: 100%; margin: 0; }
+.results { display: block !important; margin: 0; padding: 0; background: #fff; box-shadow: none; }
+.results-head { display: flex; color: #111827; margin-bottom: 5mm; border-bottom: 2px solid #172033; padding-bottom: 3mm; }
+.results-head .step { background: #f3f4f6; color: #c2410c; }
+.results-head .eyebrow { color: #c2410c; }
+.print-meta { display: block; margin: -2mm 0 4mm; color: #4b5563; }
+.metrics { grid-template-columns: repeat(4, 1fr); margin-bottom: 4mm; gap: 2mm; }
+.metric { min-height: 0; padding: 3mm; border: 1px solid #cbd5e1; background: #f8fafc; color: #111827; }
+.metric span, .metric small { color: #4b5563; }
+.metric strong { margin-top: 1mm; font-size: 18pt; }
+.result-card { padding: 0; margin: 0 0 5mm; break-inside: auto; }
+.result-title { margin-bottom: 2mm; }
+.table-scroll { overflow: visible; border-radius: 0; }
+.data-table { min-width: 0; font-size: 8pt; }
+.data-table th, .data-table td { padding: 1.8mm; }
+.plan-group { break-inside: avoid; padding: 3mm; margin-top: 3mm; }
+.pattern { break-inside: avoid; margin-top: 3mm; }
+.cut-bar { height: 12mm; print-color-adjust: exact; -webkit-print-color-adjust: exact; }

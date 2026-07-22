@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="자재 규격, 절단 길이, 홀 위치를 구분해 소요량과 절단 배치를 계산하는 무료 웹 도구">
+  <meta name="theme-color" content="#172033">
+  <title>CutFlow · 자재 절단 계산기</title>
+  <link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="stylesheet" href="css/print.css" media="print">
+  <script type="module" src="js/app.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#workspace">계산 입력으로 바로가기</a>
+  <header class="app-header">
+    <div class="brand">
+      <svg aria-hidden="true" viewBox="0 0 32 32"><path d="M5 7h22v7H5zM8 17h16v8H8zM11 10v2m5-2v2m5-2v2M11 20v2m5-2v2m5-2v2"/></svg>
+      <div><strong>CutFlow</strong><span>자재 절단 계산기</span></div>
+    </div>
+    <div class="header-actions">
+      <button class="icon-button" id="helpButton" type="button" aria-label="사용 안내 열기" title="사용 안내">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.8 9a2.3 2.3 0 1 1 3.2 2.1c-.7.4-1 .9-1 1.7M12 16.5h.01"/></svg>
+      </button>
+      <button class="icon-button" id="themeButton" type="button" aria-label="어두운 화면으로 전환" title="화면 테마">
+        <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 3v2m0 14v2M3 12h2m14 0h2M5.6 5.6 7 7m10 10 1.4 1.4M18.4 5.6 17 7M7 17l-1.4 1.4"/><circle cx="12" cy="12" r="4"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main id="workspace" class="shell">
+    <section class="hero" aria-labelledby="pageTitle">
+      <div>
+        <p class="eyebrow">MATERIAL CUTTING WORKSPACE</p>
+        <h1 id="pageTitle">같은 길이라도 홀 위치가 다르면<br><span>다른 부품으로 정확히 구분합니다.</span></h1>
+        <p>자재 모양·재질·규격별로 소요량을 묶고, 톱날 두께까지 반영해 절단 배치를 계산합니다. 모든 작업 데이터는 이 브라우저에 자동 저장됩니다.</p>
+      </div>
+      <div class="hero-badge" aria-label="주요 기능">
+        <span>홀 위치 식별</span><span>자동 복원</span><span>인쇄 최적화</span>
+      </div>
+    </section>
+
+    <section class="panel setup-panel" aria-labelledby="settingsTitle">
+      <div class="section-heading">
+        <div><span class="step">01</span><div><h2 id="settingsTitle">작업 설정</h2><p>작업명과 절단 기준을 먼저 확인하세요.</p></div></div>
+        <span id="saveStatus" class="save-status" role="status">자동 저장 준비</span>
+      </div>
+      <div class="settings-grid">
+        <label class="field field-wide"><span>작업명</span><input id="projectName" type="text" value="새 절단 작업" maxlength="80" autocomplete="off"></label>
+        <label class="field"><span>기본 원자재 길이 <small>mm</small></span><input id="standardLength" type="number" value="6000" min="1" step="1" inputmode="decimal"></label>
+        <label class="field"><span>톱날 두께 <small>mm/회</small></span><input id="kerf" type="number" value="3" min="0" step="0.1" inputmode="decimal"></label>
+        <label class="field"><span>끝단 여유 <small>mm/본</small></span><input id="endTrim" type="number" value="0" min="0" step="0.1" inputmode="decimal"></label>
+      </div>
+    </section>
+
+    <section class="panel input-panel" aria-labelledby="itemsTitle">
+      <div class="section-heading">
+        <div><span class="step">02</span><div><h2 id="itemsTitle">절단 항목</h2><p>홀 가공을 켜면 지름·개수·위치를 모두 입력합니다.</p></div></div>
+        <span id="rowCount" class="count-chip">1개 항목</span>
+      </div>
+      <form id="calculatorForm" novalidate>
+        <div class="table-scroll" tabindex="0" aria-label="절단 항목 표, 좌우로 스크롤할 수 있습니다">
+          <table class="input-table">
+            <thead><tr>
+              <th scope="col">도면 번호</th><th scope="col">자재 모양</th><th scope="col">재질</th><th scope="col">규격</th>
+              <th scope="col">절단 길이</th><th scope="col">홀</th><th scope="col">홀 지름</th><th scope="col">홀 개수</th><th scope="col">홀 위치</th>
+              <th scope="col">수량</th><th scope="col">세트</th><th scope="col">원자재 길이</th><th scope="col"><span class="sr-only">행 작업</span></th>
+            </tr></thead>
+            <tbody id="itemRows"></tbody>
+          </table>
+        </div>
+        <div id="formMessage" class="form-message" role="alert" hidden></div>
+        <div class="action-bar">
+          <div class="action-group">
+            <button class="button button-secondary" id="addRowButton" type="button">
+              <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>빈 행 추가
+            </button>
+            <button class="button button-ghost" id="copyRowButton" type="button">마지막 행 복사</button>
+          </div>
+          <button class="button button-primary" type="submit">
+            <svg aria-hidden="true" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></svg>절단 배치 계산
+          </button>
+        </div>
+      </form>
+    </section>
+
+    <section id="results" class="results" aria-labelledby="resultsTitle" hidden>
+      <div class="results-head">
+        <div><span class="step">03</span><div><p class="eyebrow">CALCULATION RESULT</p><h2 id="resultsTitle">절단 계산 결과</h2></div></div>
+        <button class="button button-light" id="printResultButton" type="button">
+          <svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z"/></svg>결과 인쇄
+        </button>
+      </div>
+      <div id="printMeta" class="print-meta"></div>
+      <div id="metrics" class="metrics"></div>
+      <section class="result-card" aria-labelledby="bomTitle"><div class="result-title"><div><span>01</span><h3 id="bomTitle">부품 명세서</h3></div><p>홀 지름·개수·위치가 다르면 별도 행으로 표시됩니다.</p></div><div id="bomContainer" class="table-scroll"></div></section>
+      <section class="result-card" aria-labelledby="summaryTitle"><div class="result-title"><div><span>02</span><h3 id="summaryTitle">발주 소요량</h3></div><p>규격과 원자재 길이별 발주 본수·중량·잔재율입니다.</p></div><div id="summaryContainer" class="table-scroll"></div></section>
+      <section class="result-card" aria-labelledby="planTitle"><div class="result-title"><div><span>03</span><h3 id="planTitle">상세 절단 배치</h3></div><p>주황색은 홀 가공 부품, 짙은색은 일반 부품입니다.</p></div><div id="plansContainer"></div></section>
+      <p class="calculation-note">이 결과는 Best Fit Decreasing 휴리스틱으로 계산한 실무용 배치안이며 수학적 최적해를 항상 보장하지 않습니다. 실제 발주 전 자재 공차, 절단기 조건과 규격별 단위중량을 확인하세요.</p>
+    </section>
+  </main>
+
+  <nav class="utility-bar" aria-label="파일 및 작업 관리">
+    <button id="newButton" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><span>새 작업</span></button>
+    <label for="fileInput" role="button" tabindex="0"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19h16V8l-5-5H4zM14 3v6h6M12 18v-6m-3 3 3-3 3 3"/></svg><span>불러오기</span></label>
+    <input id="fileInput" class="sr-only" type="file" accept="application/json,.json">
+    <button id="downloadButton" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M4 19h16V5H4zM8 5v5h8V5M8 19v-6h8v6"/></svg><span>파일 저장</span></button>
+    <button id="printButton" type="button"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="M7 8V3h10v5M7 17H5a2 2 0 0 1-2-2v-4a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2h-2M7 14h10v7H7z"/></svg><span>인쇄</span></button>
+  </nav>
+
+  <dialog id="helpDialog">
+    <div class="dialog-head"><div><p class="eyebrow">QUICK GUIDE</p><h2>계산기 사용 순서</h2></div><button class="icon-button" data-close-dialog type="button" aria-label="안내 닫기"><svg aria-hidden="true" viewBox="0 0 24 24"><path d="m6 6 12 12M18 6 6 18"/></svg></button></div>
+    <ol class="guide-list"><li><strong>절단 기준 설정</strong><span>원자재 길이, 톱날 두께와 끝단 여유를 입력합니다.</span></li><li><strong>부품 입력</strong><span>모양·재질·규격을 고르고 절단 길이와 수량을 적습니다.</span></li><li><strong>홀 정보 구분</strong><span>홀 지름과 개수가 같아도 위치가 다르면 위치 설명을 다르게 입력합니다.</span></li><li><strong>계산·확인</strong><span>부품 명세, 발주량과 절단 배치를 확인한 뒤 인쇄하거나 JSON으로 저장합니다.</span></li></ol>
+    <p class="privacy-note">입력 내용은 서버로 전송되지 않고 현재 브라우저의 로컬 저장소에만 자동 저장됩니다.</p>
+  </dialog>
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+</body>
+</html>
